@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver
+    user: root
+    environment:
+      SA_USER: "sa"
+      SA_PASSWORD: "YourSecurePassword123"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+      MSSQL_TCP_PORT: 1433
+      TRUSTED_CONNECTION: "true"
+      ENCRYPT: "false" # Desabilita SSL temporariamente para testes
+      TRUSTSERVERCERTIFICATE: "true"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - ./init.sh:/init.sh
+    entrypoint: /bin/bash /init.sh
+    privileged: true
+    networks:
+      - sql_network
+
+volumes:
+  sqlserver_data:
+
+networks:
+  sql_network:
+    driver: bridge
